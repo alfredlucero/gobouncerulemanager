@@ -101,4 +101,45 @@ DELETE FROM bounce_rule WHERE id = 4;
 -- INSERT INTO bounce_rule_change (bounce_rule_id, response_code, enhanced_code, regex, priority, description, bounce_action)
 -- VALUES (4, '475', '5.0.1', 'some 475 5.0.1 regex', 0, 'some description about 475 5.0.1', 'suppress');
 
--- Use OUTPUT clauses to update the throughput_rule_change table
+
+CREATE TABLE throughput_rule (
+  id INT(10) NOT NULL AUTO_INCREMENT,
+  mx_domain VARCHAR(255) NOT NULL UNIQUE,
+  max_connections INT(11) NOT NULL,
+  messages_per_connection INT(11) NOT NULL,
+  connection_ttl_millis INT(11) NOT NULL,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE throughput_rule_change (
+  id INT NOT NULL AUTO_INCREMENT,
+  action VARCHAR(16) NOT NULL,
+  throughput_rule_id INT(10) NOT NULL,
+  mx_domain VARCHAR(255) NOT NULL,
+  max_connections INT(11) NOT NULL,
+  messages_per_connection INT(11) NOT NULL,
+  connection_ttl_millis INT(11) NOT NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  FOREIGN KEY (throughput_rule_id) REFERENCES throughput_rule(id) ON DELETE CASCADE
+);
+
+-- SHOW TABLES;
+-- DESCRIBE throughput_rule;
+-- DESCRIBE throughput_rule_change;
+
+-- Ensure both throughput_rule and throughput_rule_change inserts happen together through transactions
+
+START TRANSACTION;
+INSERT INTO throughput_rule (mx_domain, max_connections, messages_per_connection, connection_ttl_millis)
+  VALUES('example.com', 36, 50, 0);
+INSERT INTO throughput_rule_change (action, throughput_rule_id, mx_domain, max_connections, messages_per_connection, connection_ttl_millis) 
+  VALUES('created', LAST_INSERT_ID(), 'example.com', 36, 50, 0);
+COMMIT;
+
+START TRANSACTION;
+INSERT INTO throughput_rule (mx_domain, max_connections, messages_per_connection, connection_ttl_millis)
+  VALUES('somemx.net', 100, 100, 15);
+INSERT INTO throughput_rule_change (action, throughput_rule_id, mx_domain, max_connections, messages_per_connection, connection_ttl_millis) 
+  VALUES('created', LAST_INSERT_ID(), 'somemx.net', 100, 100, 15);
+COMMIT;
