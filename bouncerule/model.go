@@ -3,6 +3,7 @@ package bouncerule
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -31,7 +32,7 @@ const bounceRuleTable = "bounce_rule"
 
 func getBounceRules(db *sql.DB) ([]BounceRule, error) {
 	statement := fmt.Sprintf("SELECT id, response_code, enhanced_code, regex, priority, description, bounce_action FROM %s", bounceRuleTable)
-	fmt.Printf("Getting bounce rules with this query: %s", statement)
+	log.Printf("Getting bounce rules with this query: %s", statement)
 	rows, err := db.Query(statement)
 
 	if err != nil {
@@ -55,11 +56,13 @@ func getBounceRules(db *sql.DB) ([]BounceRule, error) {
 
 func (br *BounceRule) getBounceRule(db *sql.DB) error {
 	statement := fmt.Sprintf("SELECT id, response_code, enhanced_code, regex, priority, description, bounce_action FROM %s WHERE id=%d", bounceRuleTable, br.ID)
+	log.Printf("Getting bounce rule with this query: %s", statement)
 	return db.QueryRow(statement).Scan(&br.ID, &br.ResponseCode, &br.EnhancedCode, &br.Regex, &br.Priority, &br.Description, &br.BounceAction)
 }
 
 func (br *BounceRule) createBounceRule(db *sql.DB) error {
 	statement := fmt.Sprintf("INSERT INTO %s (response_code, enhanced_code, regex, priority, description, bounce_action) VALUES (%d, '%s', '%s', %d, '%s', '%s')", bounceRuleTable, br.ResponseCode, br.EnhancedCode, br.Regex, br.Priority, br.Description, br.BounceAction)
+	log.Printf("Creating bounce rule with this query: %s", statement)
 	_, err := db.Exec(statement)
 
 	if err != nil {
@@ -77,12 +80,14 @@ func (br *BounceRule) createBounceRule(db *sql.DB) error {
 
 func (br *BounceRule) updateBounceRule(db *sql.DB) error {
 	statement := fmt.Sprintf("UPDATE %s SET response_code=%d, enhanced_code='%s', regex='%s', priority=%d, description='%s', bounce_action='%s' WHERE id=%d", bounceRuleTable, br.ResponseCode, br.EnhancedCode, br.Regex, br.Priority, br.Description, br.BounceAction, br.ID)
+	log.Printf("Updating bounce rule with this query: %s", statement)
 	_, err := db.Exec(statement)
 	return err
 }
 
 func (br *BounceRule) deleteBounceRule(db *sql.DB) error {
 	statement := fmt.Sprintf("DELETE FROM %s WHERE id=%d", bounceRuleTable, br.ID)
+	log.Printf("Deleting bounce rule with this query: %s", statement)
 	_, err := db.Exec(statement)
 	return err
 }
@@ -118,6 +123,7 @@ const bounceRuleChangeTable = "bounce_rule_change"
 
 func getBounceRuleChanges(db *sql.DB) ([]BounceRuleChange, error) {
 	statement := fmt.Sprintf("SELECT id, action, bounce_rule_id, response_code, enhanced_code, regex, priority, description, bounce_action, updated_at FROM %s", bounceRuleChangeTable)
+	log.Printf("Getting bounce rule changes with this query: %s", statement)
 	rows, err := db.Query(statement)
 
 	if err != nil {
@@ -141,6 +147,7 @@ func getBounceRuleChanges(db *sql.DB) ([]BounceRuleChange, error) {
 
 func getBounceRuleChangesForBounceRule(db *sql.DB, bounceRuleID int) ([]BounceRuleChange, error) {
 	statement := fmt.Sprintf("SELECT id, action, bounce_rule_id, response_code, enhanced_code, regex, priority, description, bounce_action, updated_at FROM %s WHERE bounce_rule_id = %d", bounceRuleChangeTable, bounceRuleID)
+	log.Printf("Getting bounce rule changes for bounce rule with this query: %s", statement)
 	rows, err := db.Query(statement)
 
 	if err != nil {

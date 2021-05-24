@@ -21,7 +21,7 @@ type App struct {
 func (a *App) Initialize(user, password, dbname string) {
 	connectionString := fmt.Sprintf("%s:%s@/%s?parseTime=true", user, password, dbname)
 
-	fmt.Printf("Connecting to %s...", connectionString)
+	log.Printf("Connecting to %s...", connectionString)
 
 	db, err := sql.Open("mysql", connectionString)
 	if err != nil {
