@@ -10,6 +10,9 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type App struct {
@@ -30,10 +33,29 @@ func (a *App) Initialize(user, password, dbname string) {
 
 	a.DB = db
 	a.Router = mux.NewRouter()
+	a.Router.Use(prometheusMiddleware)
 	a.initializeRoutes()
 }
 
+var (
+	httpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
+		Name: "bouncerulemanager_http_duration_seconds",
+		Help: "Duration of HTTP requests.",
+	}, []string{"path"})
+)
+
+func prometheusMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		route := mux.CurrentRoute(r)
+		path, _ := route.GetPathTemplate()
+		timer := prometheus.NewTimer(httpDuration.WithLabelValues(path))
+		next.ServeHTTP(w, r)
+		timer.ObserveDuration()
+	})
+}
+
 func (a *App) initializeRoutes() {
+	a.Router.Path("/metrics").Handler(promhttp.Handler())
 	a.Router.HandleFunc("/bounce_rules", a.getBounceRules).Methods("GET")
 	a.Router.HandleFunc("/bounce_rules", a.createBounceRule).Methods("POST")
 	a.Router.HandleFunc("/bounce_rules/{id:[0-9]+}", a.getBounceRule).Methods("GET")
