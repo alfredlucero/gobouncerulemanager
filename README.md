@@ -39,3 +39,47 @@ To start up the server you may go to `cmd/server/main.go` and do
 ```bash
 go run main.go
 ```
+
+### Sample CURLs for Bounce Rule Manager
+
+`Getting all bounce rules`
+
+```bash
+curl -X GET localhost:8000/bounce_rules
+```
+
+`Getting a specific bounce rule`
+
+```bash
+curl -X GET localhost:8000/bounce_rules/1
+```
+
+`Creating a bounce rule`
+
+```bash
+curl -d '{ "response_code": 450, "enhanced_code": "4.7.1", "regex": "someregex", "priority": 0, "description": "some description", "bounce_action": "no_action"}' -H 'Content-Type: application/json' localhost:8000/bounce_rules
+```
+
+`Updating a bounce rule`
+
+```bash
+curl -X PUT -d '{ "response_code": 451, "enhanced_code": "4.8.1", "regex": "somenewregex", "priority": 0, "description": "some description", "bounce_action": "no_action"}' -H 'Content-Type: application/json' localhost:8000/bounce_rules/5
+```
+
+`Deleting a bounce rule`
+
+```bash
+curl -X DELETE localhost:8000/bounce_rules/5
+```
+
+`Getting all bounce rule changes`
+
+```bash
+curl -X GET localhost:8000/bounce_rule_changes
+```
+
+`Getting a bounce rule's changes`
+
+```bash
+curl -X GET localhost:8000/bounce_rule_changes/3
+```
