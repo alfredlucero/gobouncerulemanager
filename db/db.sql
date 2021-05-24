@@ -72,16 +72,16 @@ DELIMITER ;
 -- SHOW TRIGGERS;
 
 INSERT INTO bounce_rule (response_code, enhanced_code, regex, priority, description, bounce_action)
-VALUES ('500', '4.7.1', 'some 500 4.7.1 regex', 0, 'some description about 500 4.7.1', 'suppress');
+VALUES (500, '4.7.1', 'some 500 4.7.1 regex', 0, 'some description about 500 4.7.1', 'suppress');
 INSERT INTO bounce_rule (response_code, enhanced_code, regex, priority, description, bounce_action)
-VALUES ('450', '4.7.2', 'some 450 4.7.2 regex', 0, 'some description about 450 4.7.2', 'retry');
+VALUES (450, '4.7.2', 'some 450 4.7.2 regex', 0, 'some description about 450 4.7.2', 'retry');
 INSERT INTO bounce_rule (response_code, enhanced_code, regex, priority, description, bounce_action)
-VALUES ('501', '4.7.3', 'some 501 4.7.3 regex', 0, 'some description about 501 4.7.3', 'no_action');
+VALUES (501, '4.7.3', 'some 501 4.7.3 regex', 0, 'some description about 501 4.7.3', 'no_action');
 INSERT INTO bounce_rule (response_code, enhanced_code, regex, priority, description, bounce_action)
-VALUES ('475', '5.0.1', 'some 475 5.0.1 regex', 0, 'some description about 475 5.0.1', 'suppress');
+VALUES (475, '5.0.1', 'some 475 5.0.1 regex', 0, 'some description about 475 5.0.1', 'suppress');
 
 UPDATE bounce_rule 
-SET response_code = '502',
+SET response_code = 502,
     enhanced_code = '4.7.3',
     regex = 'some 502 4.7.3 regex',
     priority = 1,
@@ -92,14 +92,14 @@ WHERE id = 3;
 -- SELECT * FROM bounce_rule;
 DELETE FROM bounce_rule WHERE id = 4;
 
+-- INSERT INTO bounce_rule_change (action, bounce_rule_id, response_code, enhanced_code, regex, priority, description, bounce_action)
+-- VALUES ('created', 1, 500, '4.7.1', 'some 500 4.7.1 regex', 0, 'some description about 500 4.7.1', 'suppress');
 -- INSERT INTO bounce_rule_change (bounce_rule_id, response_code, enhanced_code, regex, priority, description, bounce_action)
--- VALUES (1, '500', '4.7.1', 'some 500 4.7.1 regex', 0, 'some description about 500 4.7.1', 'suppress');
+-- VALUES ('created', 2, 450, '4.7.2', 'some 450 4.7.2 regex', 0, 'some description about 450 4.7.2', 'retry');
 -- INSERT INTO bounce_rule_change (bounce_rule_id, response_code, enhanced_code, regex, priority, description, bounce_action)
--- VALUES (2, '450', '4.7.2', 'some 450 4.7.2 regex', 0, 'some description about 450 4.7.2', 'retry');
+-- VALUES ('created', 3, 501, '4.7.3', 'some 501 4.7.3 regex', 0, 'some description about 501 4.7.3', 'no_action');
 -- INSERT INTO bounce_rule_change (bounce_rule_id, response_code, enhanced_code, regex, priority, description, bounce_action)
--- VALUES (3, '501', '4.7.3', 'some 501 4.7.3 regex', 0, 'some description about 501 4.7.3', 'no_action');
--- INSERT INTO bounce_rule_change (bounce_rule_id, response_code, enhanced_code, regex, priority, description, bounce_action)
--- VALUES (4, '475', '5.0.1', 'some 475 5.0.1 regex', 0, 'some description about 475 5.0.1', 'suppress');
+-- VALUES ('created', 4, 475, '5.0.1', 'some 475 5.0.1 regex', 0, 'some description about 475 5.0.1', 'suppress');
 
 
 CREATE TABLE throughput_rule (

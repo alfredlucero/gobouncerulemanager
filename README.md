@@ -28,6 +28,10 @@ Make sure to export these environment variables so the server knows how to conne
 export MYSQL_USER=username
 export MYSQL_PASSWORD=password
 export MYSQL_DATABASE=database
+export SERVER_PORT=8000
+
+# OR you can change the values in local.conf and do
+source local.conf
 ```
 
 To start up the server you may go to `cmd/server/main.go` and do
