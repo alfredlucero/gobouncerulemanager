@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
-	// "gobrm/throughputrule"
+	"gobrm/throughputrule"
+
 	"github.com/kelseyhightower/envconfig"
 )
 
@@ -32,4 +34,10 @@ func main() {
 		log.Fatal(err.Error())
 	}
 	log.Printf("Server Config: %+v", serverConfig)
+
+	address := fmt.Sprintf(":%d", serverConfig.Port)
+
+	a := throughputrule.App{}
+	a.Initialize(mySQLConfig.User, mySQLConfig.Password, mySQLConfig.Database)
+	a.Run(address)
 }

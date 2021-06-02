@@ -1,12 +1,90 @@
 package throughputrule
 
 import (
-	"database/sql"
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 type App struct {
-	Router *mux.Router
-	DB     *sql.DB
+	Router *chi.Mux
+}
+
+func (a *App) Initialize(user, password, dbname string) {
+	connectionString := fmt.Sprintf("%s:%s@/%s?parseTime=true", user, password, dbname)
+
+	log.Printf("Connecting to %s...", connectionString)
+
+	// TODO: figure out DB stuff with sqlboiler
+	// db, err := sql.Open("mysql", connectionString)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// a.DB = db
+	a.Router = chi.NewRouter()
+	a.Router.Use(middleware.Logger)
+	a.initializeRoutes()
+}
+
+func (a *App) initializeRoutes() {
+	a.Router.Route("/throughput_rules", func(r chi.Router) {
+		r.Get("/", a.getThroughputRules)
+		r.Post("/", a.createThroughputRule)
+		r.Get("/{id:[0-9]+}", a.getThroughputRule)
+		r.Put("/{id:[0-9]+}", a.updateThroughputRule)
+		r.Delete("/{id:[0-9]+}", a.deleteThroughputRule)
+	})
+
+	a.Router.Route("/throughput_rule_changes", func(r chi.Router) {
+		r.Get("/", a.getThroughputRuleChanges)
+		r.Get("/{id:[0-9]+}", a.getThroughputRuleChangesForThroughputRule)
+	})
+}
+
+func (a *App) Run(addr string) {
+	log.Fatal(http.ListenAndServe(addr, a.Router))
+}
+
+func respondWithError(w http.ResponseWriter, code int, message string) {
+	respondWithJSON(w, code, map[string]string{"error": message})
+}
+
+func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+	response, _ := json.Marshal(payload)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(response)
+}
+
+func (a *App) getThroughputRules(w http.ResponseWriter, r *http.Request) {
+	respondWithJSON(w, http.StatusOK, []string{"throughput1", "throughput2"})
+}
+
+func (a *App) createThroughputRule(w http.ResponseWriter, r *http.Request) {
+	respondWithJSON(w, http.StatusOK, []string{"throughput1", "throughput2"})
+}
+
+func (a *App) getThroughputRule(w http.ResponseWriter, r *http.Request) {
+	respondWithJSON(w, http.StatusOK, []string{"throughput1", "throughput2"})
+}
+
+func (a *App) updateThroughputRule(w http.ResponseWriter, r *http.Request) {
+	respondWithJSON(w, http.StatusOK, []string{"throughput1", "throughput2"})
+}
+
+func (a *App) deleteThroughputRule(w http.ResponseWriter, r *http.Request) {
+	respondWithJSON(w, http.StatusOK, []string{"throughput1", "throughput2"})
+}
+
+func (a *App) getThroughputRuleChanges(w http.ResponseWriter, r *http.Request) {
+	respondWithJSON(w, http.StatusOK, []string{"throughputchange1", "throughputchange2"})
+}
+
+func (a *App) getThroughputRuleChangesForThroughputRule(w http.ResponseWriter, r *http.Request) {
+	respondWithJSON(w, http.StatusOK, []string{"throughputchange1", "throughputchange2"})
 }
