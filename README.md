@@ -40,6 +40,22 @@ To start up the server you may go to `cmd/server/main.go` and do
 go run main.go
 ```
 
+### Using Prometheus and Grafana
+
+We have a /metrics endpoint that gives us back some Prometheus metrics that we can visualize with Grafana.
+
+Assuming you have Docker Desktop for Mac installed and running, you can start up the bounce rule server and the Grafana server like this.
+
+```bash
+# In one terminal start up the web server
+go run cmd/bounceruleserver/main.go
+
+# In another terminal instance, start up Grafana
+docker run -d -p 3000:3000 grafana/grafana
+```
+
+Log into the Grafana server with admin/admin and connect to the Prometheus data source on http://localhost:8000.
+
 ### Sample CURLs for Bounce Rule Manager
 
 `Getting all bounce rules`

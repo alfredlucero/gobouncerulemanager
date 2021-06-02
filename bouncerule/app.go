@@ -20,6 +20,8 @@ type App struct {
 	DB     *sql.DB
 }
 
+// TODO: look into Chi for router and gorilla mux differences (not compatible with standard)
+
 // Create database connection and wire up routes.
 func (a *App) Initialize(user, password, dbname string) {
 	connectionString := fmt.Sprintf("%s:%s@/%s?parseTime=true", user, password, dbname)

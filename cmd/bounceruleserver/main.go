@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// TODO: Kelsey hightower env config
 func main() {
 	a := bouncerule.App{}
 
