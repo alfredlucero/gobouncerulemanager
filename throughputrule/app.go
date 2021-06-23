@@ -50,6 +50,7 @@ func (a *App) initializeRoutes() {
 }
 
 func (a *App) Run(addr string) {
+	log.Printf("Starting up server with addr %s", addr)
 	log.Fatal(http.ListenAndServe(addr, a.Router))
 }
 
@@ -65,7 +66,14 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 }
 
 func (a *App) getThroughputRules(w http.ResponseWriter, r *http.Request) {
-	respondWithJSON(w, http.StatusOK, []string{"throughput1", "throughput2"})
+	throughputRules, err := getThroughputRules(a.DB)
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, throughputRules)
 }
 
 func (a *App) createThroughputRule(w http.ResponseWriter, r *http.Request) {

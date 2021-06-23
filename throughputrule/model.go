@@ -1,6 +1,10 @@
 package throughputrule
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
+	"gobrm/models"
+)
 
 // CREATE TABLE throughput_rule (
 //   id INT(10) NOT NULL AUTO_INCREMENT,
@@ -13,8 +17,15 @@ import "database/sql"
 
 const throughputRuleTable = "throughput_rule"
 
-func getThroughputRules(db *sql.DB) {
+func getThroughputRules(db *sql.DB) (models.ThroughputRuleSlice, error) {
+	ctx := context.Background()
+	throughputRules, err := models.ThroughputRules().All(ctx, db)
 
+	if err != nil {
+		return nil, err
+	}
+
+	return throughputRules, nil
 }
 
 func getThroughputRule(db *sql.DB) {
