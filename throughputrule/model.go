@@ -47,8 +47,18 @@ func updateThroughputRule(db *sql.DB) {
 
 }
 
-func deleteThroughputRule(db *sql.DB) {
+func deleteThroughputRule(db *sql.DB, id int) error {
+	ctx := context.Background()
+	throughputRule, err := models.FindThroughputRule(ctx, db, id)
+	if err != nil {
+		return err
+	}
 
+	_, err = throughputRule.Delete(ctx, db)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // CREATE TABLE throughput_rule_change (

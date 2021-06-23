@@ -59,6 +59,11 @@ func respondWithError(w http.ResponseWriter, code int, message string) {
 }
 
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+	if code == http.StatusNoContent {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(code)
+		return
+	}
 	response, _ := json.Marshal(payload)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
@@ -118,8 +123,18 @@ func (a *App) deleteThroughputRule(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid throughput rule ID")
 		return
 	}
+
 	log.Printf("Deleting throughput rule with id %d", id)
-	respondWithJSON(w, http.StatusOK, []string{"throughput1", "throughput2"})
+	if err := deleteThroughputRule(a.DB, id); err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			respondWithError(w, http.StatusNotFound, "Throughput rule not found")
+		default:
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+	respondWithJSON(w, http.StatusNoContent, nil)
 }
 
 func (a *App) getThroughputRuleChanges(w http.ResponseWriter, r *http.Request) {
