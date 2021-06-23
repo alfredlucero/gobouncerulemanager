@@ -99,3 +99,17 @@ curl -X GET localhost:8000/bounce_rule_changes
 ```bash
 curl -X GET localhost:8000/bounce_rule_changes/3
 ```
+
+### Sample CURLs for Throughput Rule Manager
+
+`Getting all throughput rules`
+
+```bash
+curl -X GET localhost:8000/throughput_rules
+```
+
+`Getting a specific throughput rule`
+
+```bash
+curl -X GET localhost:8000/throughput_rules/1
+```

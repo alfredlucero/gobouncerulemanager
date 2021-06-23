@@ -28,8 +28,15 @@ func getThroughputRules(db *sql.DB) (models.ThroughputRuleSlice, error) {
 	return throughputRules, nil
 }
 
-func getThroughputRule(db *sql.DB) {
+func getThroughputRule(db *sql.DB, id int) (*models.ThroughputRule, error) {
+	ctx := context.Background()
+	throughputRule, err := models.FindThroughputRule(ctx, db, id)
 
+	if err != nil {
+		return nil, err
+	}
+
+	return throughputRule, nil
 }
 
 func createThroughputRule(db *sql.DB) {

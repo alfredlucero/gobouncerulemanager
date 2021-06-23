@@ -86,8 +86,20 @@ func (a *App) getThroughputRule(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid throughput rule ID")
 		return
 	}
+
 	log.Printf("Getting throughput rule with id %d", id)
-	respondWithJSON(w, http.StatusOK, []string{"throughput1", "throughput2"})
+	throughputRule, err := getThroughputRule(a.DB, id)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			respondWithError(w, http.StatusNotFound, "Throughput rule not found")
+		default:
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, throughputRule)
 }
 
 func (a *App) updateThroughputRule(w http.ResponseWriter, r *http.Request) {
