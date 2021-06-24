@@ -138,7 +138,14 @@ func (a *App) deleteThroughputRule(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) getThroughputRuleChanges(w http.ResponseWriter, r *http.Request) {
-	respondWithJSON(w, http.StatusOK, []string{"throughputchange1", "throughputchange2"})
+	throughputRuleChanges, err := getThroughputRuleChanges(a.DB)
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, throughputRuleChanges)
 }
 
 func (a *App) getThroughputRuleChangesForThroughputRule(w http.ResponseWriter, r *http.Request) {
@@ -147,6 +154,18 @@ func (a *App) getThroughputRuleChangesForThroughputRule(w http.ResponseWriter, r
 		respondWithError(w, http.StatusBadRequest, "Invalid throughput rule ID")
 		return
 	}
+
 	log.Printf("Getting throughput rule changes for throughput rule with id %d", id)
-	respondWithJSON(w, http.StatusOK, []string{"throughputchange1", "throughputchange2"})
+	throughputRuleChanges, err := getThroughputRuleChangesForThroughputRule(a.DB, id)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			respondWithError(w, http.StatusNotFound, "Throughput rule changes for throughput rule not found")
+		default:
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, throughputRuleChanges)
 }

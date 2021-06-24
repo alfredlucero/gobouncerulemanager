@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"gobrm/models"
+
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 // CREATE TABLE throughput_rule (
@@ -14,8 +16,6 @@ import (
 //   connection_ttl_millis INT(11) NOT NULL,
 //   PRIMARY KEY(id)
 // );
-
-const throughputRuleTable = "throughput_rule"
 
 func getThroughputRules(db *sql.DB) (models.ThroughputRuleSlice, error) {
 	ctx := context.Background()
@@ -74,12 +74,24 @@ func deleteThroughputRule(db *sql.DB, id int) error {
 //   FOREIGN KEY (throughput_rule_id) REFERENCES throughput_rule(id) ON DELETE CASCADE
 // );
 
-const throughputRuleChangeTable = "throughput_rule_change"
+func getThroughputRuleChanges(db *sql.DB) (models.ThroughputRuleChangeSlice, error) {
+	ctx := context.Background()
+	throughputRuleChanges, err := models.ThroughputRuleChanges().All(ctx, db)
 
-func getThroughputRuleChanges(db *sql.DB) {
+	if err != nil {
+		return nil, err
+	}
 
+	return throughputRuleChanges, nil
 }
 
-func getThroughputRuleChangesForThroughputRule(db *sql.DB) {
+func getThroughputRuleChangesForThroughputRule(db *sql.DB, id int) (models.ThroughputRuleChangeSlice, error) {
+	ctx := context.Background()
+	throughputRuleChanges, err := models.ThroughputRuleChanges(qm.Where("throughput_rule_id=?", id)).All(ctx, db)
 
+	if err != nil {
+		return nil, err
+	}
+
+	return throughputRuleChanges, nil
 }

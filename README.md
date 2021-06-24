@@ -113,3 +113,15 @@ curl -X GET localhost:8000/throughput_rules
 ```bash
 curl -X GET localhost:8000/throughput_rules/1
 ```
+
+`Getting all throughput rule changes`
+
+```bash
+curl -X GET localhost:8000throughput_rule_changes
+```
+
+`Getting a throughput rule's changes`
+
+```bash
+curl -X GET localhost:8000/throughput_rule_changes/1
+```
