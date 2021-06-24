@@ -114,6 +114,12 @@ curl -X GET localhost:8000/throughput_rules
 curl -X GET localhost:8000/throughput_rules/1
 ```
 
+`Creating a throughput rule`
+
+```bash
+curl -d '{ "mx_domain": "google.net", "max_connections": 100, "messages_per_connection": 100, "connection_ttl_millis": 1000}' -H 'Content-Type: application/json' localhost:8000/throughput_rules
+```
+
 `Getting all throughput rule changes`
 
 ```bash

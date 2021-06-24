@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"gobrm/models"
 
+	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
@@ -39,8 +40,37 @@ func getThroughputRule(db *sql.DB, id int) (*models.ThroughputRule, error) {
 	return throughputRule, nil
 }
 
-func createThroughputRule(db *sql.DB) {
+func createThroughputRule(db *sql.DB, throughputRule models.ThroughputRule) error {
+	ctx := context.Background()
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
 
+	err = throughputRule.Insert(ctx, db, boil.Infer())
+
+	if err != nil {
+		return err
+	}
+
+	throughputRuleChange := models.ThroughputRuleChange{
+		Action:                "created",
+		ThroughputRuleID:      throughputRule.ID,
+		MXDomain:              throughputRule.MXDomain,
+		MaxConnections:        throughputRule.MaxConnections,
+		MessagesPerConnection: throughputRule.MessagesPerConnection,
+		ConnectionTTLMillis:   throughputRule.ConnectionTTLMillis,
+	}
+
+	err = throughputRuleChange.Insert(ctx, db, boil.Infer())
+
+	if err != nil {
+		return err
+	}
+
+	tx.Commit()
+
+	return nil
 }
 
 func updateThroughputRule(db *sql.DB) {

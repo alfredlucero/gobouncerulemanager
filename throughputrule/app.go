@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"gobrm/models"
 	"log"
 	"net/http"
 	"strconv"
@@ -82,7 +83,20 @@ func (a *App) getThroughputRules(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) createThroughputRule(w http.ResponseWriter, r *http.Request) {
-	respondWithJSON(w, http.StatusOK, []string{"throughput1", "throughput2"})
+	var throughputRule models.ThroughputRule
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&throughputRule); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid throughput rule request payload")
+		return
+	}
+	defer r.Body.Close()
+
+	if err := createThroughputRule(a.DB, throughputRule); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusCreated, throughputRule)
 }
 
 func (a *App) getThroughputRule(w http.ResponseWriter, r *http.Request) {
