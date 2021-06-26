@@ -127,8 +127,28 @@ func (a *App) updateThroughputRule(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid throughput rule ID")
 		return
 	}
+
+	var throughputRule models.ThroughputRule
+	throughputRule.ID = id
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&throughputRule); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid throughput rule request payload")
+		return
+	}
+	defer r.Body.Close()
+
 	log.Printf("Updating throughput rule with id %d", id)
-	respondWithJSON(w, http.StatusOK, []string{"throughput1", "throughput2"})
+	if err := updateThroughputRule(a.DB, throughputRule); err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			respondWithError(w, http.StatusNotFound, "Throughput rule not found")
+		default:
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, throughputRule)
 }
 
 func (a *App) deleteThroughputRule(w http.ResponseWriter, r *http.Request) {

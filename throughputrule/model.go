@@ -73,8 +73,48 @@ func createThroughputRule(db *sql.DB, throughputRule models.ThroughputRule) erro
 	return nil
 }
 
-func updateThroughputRule(db *sql.DB) {
+func updateThroughputRule(db *sql.DB, throughputRule models.ThroughputRule) error {
+	ctx := context.Background()
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
 
+	currentThroughputRule, err := models.FindThroughputRule(ctx, db, throughputRule.ID)
+
+	if err != nil {
+		return err
+	}
+
+	currentThroughputRule.MXDomain = throughputRule.MXDomain
+	currentThroughputRule.MaxConnections = throughputRule.MaxConnections
+	currentThroughputRule.MessagesPerConnection = throughputRule.MessagesPerConnection
+	currentThroughputRule.ConnectionTTLMillis = throughputRule.ConnectionTTLMillis
+
+	_, err = currentThroughputRule.Update(ctx, db, boil.Infer())
+
+	if err != nil {
+		return err
+	}
+
+	throughputRuleChange := models.ThroughputRuleChange{
+		Action:                "updated",
+		ThroughputRuleID:      currentThroughputRule.ID,
+		MXDomain:              currentThroughputRule.MXDomain,
+		MaxConnections:        currentThroughputRule.MaxConnections,
+		MessagesPerConnection: currentThroughputRule.MessagesPerConnection,
+		ConnectionTTLMillis:   currentThroughputRule.ConnectionTTLMillis,
+	}
+
+	err = throughputRuleChange.Insert(ctx, db, boil.Infer())
+
+	if err != nil {
+		return err
+	}
+
+	tx.Commit()
+
+	return nil
 }
 
 func deleteThroughputRule(db *sql.DB, id int) error {

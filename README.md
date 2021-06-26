@@ -120,6 +120,18 @@ curl -X GET localhost:8000/throughput_rules/1
 curl -d '{ "mx_domain": "google.net", "max_connections": 100, "messages_per_connection": 100, "connection_ttl_millis": 1000}' -H 'Content-Type: application/json' localhost:8000/throughput_rules
 ```
 
+`Updating a throughput rule`
+
+```bash
+curl -X PUT -d '{ "mx_domain": "googlemxupdated.net", "max_connections": 101, "messages_per_connection": 101, "connection_ttl_millis": 1001}' -H 'Content-Type: application/json' localhost:8000/throughput_rules/2
+```
+
+`Deleting a throughput rule`
+
+```bash
+curl -X DELETE localhost:8000/throughput_rules/2
+```
+
 `Getting all throughput rule changes`
 
 ```bash
