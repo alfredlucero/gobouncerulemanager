@@ -56,7 +56,32 @@ func TestGetBounceRules(t *testing.T) {
 
 func TestGetBounceRule(t *testing.T) {
 	log.Print("Testing model's getBounceRule")
-	assert.True(t, true, "True is true!")
+	db, mock, err := sqlmock.New()
+	assert.NoErrorf(t, err, "an error '%s' was not expected when opening a stub database connection", err)
+	defer db.Close()
+
+	rows := sqlmock.NewRows([]string{"id", "response_code", "enhanced_code", "regex", "priority", "description", "bounce_action"}).
+		AddRow(1, 450, "4.7.1", "regex1", 1, "description1", "suppress")
+
+	id := 1
+	mock.ExpectQuery("SELECT").WillReturnRows(rows)
+	expectedBounceRule := BounceRule{
+		ID:           id,
+		ResponseCode: 450,
+		EnhancedCode: "4.7.1",
+		Regex:        "regex1",
+		Priority:     1,
+		Description:  "description1",
+		BounceAction: "suppress",
+	}
+	bounceRule := BounceRule{ID: id}
+	bounceRuleErr := bounceRule.getBounceRule(db)
+
+	assert.NoError(t, bounceRuleErr, "should not receive an error when getting bounce rule")
+	assert.Equalf(t, expectedBounceRule, bounceRule, "bounce rule does not match %v", expectedBounceRule)
+
+	mockErr := mock.ExpectationsWereMet()
+	assert.NoErrorf(t, mockErr, "did not pass expectations such as %s", mockErr)
 }
 
 func TestCreateBounceRule(t *testing.T) {
